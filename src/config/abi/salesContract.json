@@ -1,0 +1,398 @@
+[{
+        "type": "event",
+        "name": "OwnershipTransferred",
+        "inputs": [{
+                "type": "address",
+                "name": "previousOwner",
+                "internalType": "address",
+                "indexed": true
+            },
+            {
+                "type": "address",
+                "name": "newOwner",
+                "internalType": "address",
+                "indexed": true
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "fallback",
+        "stateMutability": "payable"
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "MAX",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "MIN",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "address",
+            "name": "",
+            "internalType": "address"
+        }],
+        "name": "addmissionProfile",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "bought",
+        "inputs": [{
+            "type": "address",
+            "name": "",
+            "internalType": "address"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "emergencyWithdrawTokens",
+        "inputs": [{
+            "type": "address",
+            "name": "_token",
+            "internalType": "contract IBEP20"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "endBlock",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "normalRate",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "numberPoints",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "address",
+            "name": "",
+            "internalType": "address"
+        }],
+        "name": "owner",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "pointThreshold",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "privateBlocks",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "raisingAmount",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "renounceOwnership",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setAdmissionProfile",
+        "inputs": [{
+            "type": "address",
+            "name": "_admissionProfile",
+            "internalType": "address"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setBeneficiary",
+        "inputs": [{
+            "type": "address",
+            "name": "_beneficiary",
+            "internalType": "address payable"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setMinMax",
+        "inputs": [{
+                "type": "uint256",
+                "name": "_min",
+                "internalType": "uint256"
+            },
+            {
+                "type": "uint256",
+                "name": "_max",
+                "internalType": "uint256"
+            }
+        ]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setRaisingAmount",
+        "inputs": [{
+            "type": "uint256",
+            "name": "_raisingAmount",
+            "internalType": "uint256"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setRate",
+        "inputs": [{
+            "type": "uint256",
+            "name": "_normalRate",
+            "internalType": "uint256"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setToken",
+        "inputs": [{
+            "type": "address",
+            "name": "_token",
+            "internalType": "contract IBEP20"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setendBlock",
+        "inputs": [{
+            "type": "uint256",
+            "name": "_block",
+            "internalType": "uint256"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "setstartBlock",
+        "inputs": [{
+            "type": "uint256",
+            "name": "_startBlock",
+            "internalType": "uint256"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "sold",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "startBlock",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "thresholdPoints",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "address",
+            "name": "",
+            "internalType": "contract IBEP20"
+        }],
+        "name": "token",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "totalAmount",
+        "inputs": []
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "transferOwnership",
+        "inputs": [{
+            "type": "address",
+            "name": "newOwner",
+            "internalType": "address"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+                "type": "uint256",
+                "name": "",
+                "internalType": "uint256"
+            },
+            {
+                "type": "uint256",
+                "name": "",
+                "internalType": "uint256"
+            },
+            {
+                "type": "uint256",
+                "name": "",
+                "internalType": "uint256"
+            },
+            {
+                "type": "bool",
+                "name": "",
+                "internalType": "bool"
+            },
+            {
+                "type": "uint256",
+                "name": "",
+                "internalType": "uint256"
+            },
+            {
+                "type": "uint256",
+                "name": "",
+                "internalType": "uint256"
+            },
+            {
+                "type": "bool",
+                "name": "",
+                "internalType": "bool"
+            }
+        ],
+        "name": "viewPoolInformation",
+        "inputs": [{
+            "type": "uint256",
+            "name": "_pid",
+            "internalType": "uint256"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "view",
+        "outputs": [{
+            "type": "uint256",
+            "name": "",
+            "internalType": "uint256"
+        }],
+        "name": "viewPoolTaxRateOverflow",
+        "inputs": [{
+            "type": "uint256",
+            "name": "_pid",
+            "internalType": "uint256"
+        }]
+    },
+    {
+        "type": "function",
+        "stateMutability": "nonpayable",
+        "outputs": [],
+        "name": "withdraw",
+        "inputs": []
+    },
+    {
+        "type": "receive",
+        "stateMutability": "payable"
+    }
+]
