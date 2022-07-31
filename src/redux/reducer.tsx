@@ -6,10 +6,20 @@ export interface ApprovalDefualts {
     isApproving: boolean,
 }
 
+export interface SwapDefualts {
+    isSwaping: boolean,
+    isSwaped: boolean,
+}
+
 const defaultApprovestate: ApprovalDefualts = {
     isApproved: false,
     approveAmount: 0,
     isApproving: false
+}
+
+const defaultSwapstate: SwapDefualts = {
+    isSwaping: false,
+    isSwaped: false,
 }
 
 export interface DefaultStateI {
@@ -80,9 +90,51 @@ interface ApprovalReset {
     payload: typeof defaultApprovestate;
 }
 
+interface SwapPending {
+    type: typeof types.SWAP_PENDING;
+    payload: typeof defaultSwapstate;
+}
+
+interface SwapDone {
+    type: typeof types.SWAP_DONE;
+    payload: typeof defaultSwapstate;
+}
+interface SwapBefore {
+    type: typeof types.BEFORE_SWAP;
+    payload: typeof defaultSwapstate;
+}
+
+
+
+
 
 export type WalletActions = ConnectedWallet | ConnectingWallet | DisconnectedWallet | NetworkChange | AccountChange | WalletReset;
 export type ApprovalActions = ApprovedState | ApprovedTrue | IsApproving | ApprovalReset;
+export type SwapActions = SwapPending | SwapDone | SwapBefore;
+
+
+export const swapreducer = (state: SwapDefualts = defaultSwapstate, action: SwapActions) => {
+    switch (action.type) {
+        case types.BEFORE_SWAP:
+            return defaultSwapstate;
+        case types.SWAP_PENDING:
+            return {
+                ...state,
+                isSwaping: true,
+                isSwaped: false,
+            }
+        case types.SWAP_DONE:
+            return {
+                ...state,
+                isSwaping: false,
+                isSwaped: true,
+            }
+
+        default:
+            return state;
+
+    }
+}
 
 export const approvalreducer = (state: ApprovalDefualts = defaultApprovestate, action: ApprovalActions) => {
     switch (action.type) {
@@ -110,9 +162,7 @@ export const approvalreducer = (state: ApprovalDefualts = defaultApprovestate, a
                 isApproved: false,
                 approveAmount: 0,
                 isApproving: true
-
             }
-
         default:
             return state;
     }

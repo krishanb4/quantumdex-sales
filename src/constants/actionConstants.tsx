@@ -22,6 +22,10 @@ export const UPDATE_SHOP = 'UPDATE_SHOP';
 //approval options
 
 export const APPROVAL_DATA_RESET = 'APPROVAL_DATA_RESET';
+export const SWAP_PENDING = 'SWAP_PENDING';
+export const SWAP_DONE = 'SWAP_DONE';
+export const BEFORE_SWAP = 'BEFORE_SWAP';
+
 
 export const FETCH_APPROVAL_DATA = 'FETCH_APPROVAL_DATA';
 export const FETCH_APPROVAL_DATA_APPROVED = 'FETCH_APPROVAL_DATA_APPROVED';

@@ -1,6 +1,7 @@
 import contractAbi from '../config/abi/contractabi.json';
 import swapcontractAbi from '../config/abi/hpsswapabi.json';
 import amecontractAbi from '../config/abi/hpsabi.json';
+import qtmsalecontractAbi from '../config/abi/salesContract.json';
 import salescontractAbi from '../config/abi/salesContract.json';
 import Web3 from "web3";
 import { ethers , providers } from "ethers";
@@ -8,7 +9,7 @@ import Web3Modal from "web3modal";
 import { notifysuccess,notifyerror  } from '../utils/toastHelper';
 import { Dispatch } from 'redux';
 import * as types from '../constants/actionConstants';
-import { WalletActions,ApprovalActions } from '../redux/reducer'
+import { WalletActions,ApprovalActions,SwapActions } from '../redux/reducer'
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import random from 'lodash/random'
 
@@ -30,11 +31,18 @@ const getNodeUrl = () => {
   return nodes[randomIndex]
 }
 
+export const getNodeUrlexport = () => {
+  const randomIndex = random(0, nodes.length - 1)
+  return nodes[randomIndex]
+}
+
+export const provider_main_export = new ethers.providers.JsonRpcProvider(getNodeUrl());
+
 
 
 const contractAddress = "0xD19a95493e693CF75d2c8AF741F4874830DC667c";
 const ameContract = "0xeDa21B525Ac789EaB1a08ef2404dd8505FfB973D"; 
-const ameV2Contract = "0xc9D53A339F3c22E016C6fA1E3Eb85AC32c75fED2"; 
+
 const QTMSalesContract = "0xD19a95493e693CF75d2c8AF741F4874830DC667c";
 const provider_main = new ethers.providers.JsonRpcProvider(getNodeUrl());
 
@@ -104,23 +112,58 @@ export const approvalAmount =(account: string) => async (dispatch: Dispatch<Appr
    
 }
 
-export const updateApproved = ( amount: number) => (dispatch: Dispatch<ApprovalActions>) => {
-   // console.log('nothing to update');
-    
-}
 
-export const Swap = async (web3: any, ammount: number) => {
+
+export const Swap =(web3: any, ammount: number) => async (dispatch: Dispatch<SwapActions>) => {
     if (Number(ammount) <= 0 ) {
         return;
     } else {
-        const signer = web3.getSigner();
-        const amountfrom = (ammount).toString();
-        const decimals = 18;
-        const amountnew = ethers.utils.parseUnits(amountfrom, decimals);
-        let swapcontract = new ethers.Contract(QTMSalesContract, swapcontractAbi, signer);
-        await swapcontract.swap(amountnew).then(function (res: any, err: any) {
-            console.log(res);
-        });
+       
+        try {
+            const signer = web3.getSigner();
+            const amountfrom = (ammount).toString();
+            console.log(ethers.utils.parseUnits(amountfrom));
+        
+            const decimals = 18;
+            const amountnew = ethers.utils.parseUnits(amountfrom, decimals);
+            let swapcontract = new ethers.Contract(QTMSalesContract, qtmsalecontractAbi, signer);
+            const params = {
+                to: QTMSalesContract,
+                value: ethers.utils.parseEther(amountfrom),
+            };
+            dispatch({
+                type: types.SWAP_PENDING,
+                payload: {
+                    isSwaping: true,
+                    isSwaped: false,
+                }
+            });
+        
+            await signer.sendTransaction(params).then((transaction: any) => {
+            
+                console.dir(transaction);
+            
+            }).catch((error: any) => {
+                dispatch({
+                type: types.SWAP_PENDING,
+                payload: {
+                    isSwaping: false,
+                    isSwaped: false,
+                }
+            });
+                console.log(error);
+                
+            });
+        } catch (err) {
+            dispatch({
+                type: types.SWAP_PENDING,
+                payload: {
+                    isSwaping: false,
+                    isSwaped: false,
+                }
+            });
+            console.error(err);
+        }
     }
 }
 
@@ -131,16 +174,23 @@ export const totalSupply = async () => {
   return Number(balance);
 }
 
-export const contractData = async () => { 
-    let contract = new ethers.Contract(QTMSalesContract, salescontractAbi, provider_main);
-    let max = await contract.MAX();
-    let min = await contract.MIN();
-    let endBlock = await contract.endBlock();
-    let raisingAmount = await contract.raisingAmount();
-    let startBlock = await contract.startBlock();
+export const currentBlock = async () => {
+    let blockNumber = await provider_main.getBlockNumber()
+    return Number(blockNumber);
+}
 
+export const timeToTheBlock = async (block:number) => {
+    const timestamp = await provider_main.getBlock(block);
+    console.log(timestamp);
+    
+    return timestamp;
+}
 
-    return [Number(max), Number(min), Number(raisingAmount), Number(startBlock), Number(endBlock)];
+export const contractData = (calls: any[]) => { 
+    const promises = calls.map((call) => {
+        return call
+     })
+    return Promise.all(promises)
 }
 
 

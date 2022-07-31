@@ -9,9 +9,13 @@
 
 body {
     min-height: 100hv;
-    background: linear-gradient(90deg, rgba(4, 120, 13, 1) 0%, rgba(21, 235, 252, 1) 69%);
+    background: linear-gradient(135deg, #8d00ff 60%, cyan);
 }
 
 code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.MuiTypography-root {
+    color: white !important;
 }

@@ -137,18 +137,16 @@ export const connectWallet = () => async (dispatch: Dispatch<WalletActions | App
         const accounts = await web3.eth.getAccounts();
         const address = accounts[0];
         let networkId = await web3.eth.getChainId();
-        console.log(networkId);
 
 
 
 
-        // if (networkId === 86) {
-        //     networkId = Number(process.env.REACT_APP_NETWORK_ID);
-        // }
+
+
         const addresstopass = address.toString();
-        console.log(addresstopass);
 
-        //  const getameBalancefrom = await getameBalance(addresstopass);
+
+
         const getameBalancefromWallet = await web3Provider.getBalance(addresstopass);
         const getameBalancefrom = ethers.utils.formatEther(getameBalancefromWallet);
 

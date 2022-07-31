@@ -1,4 +1,4 @@
-import React, { useEffect, ChangeEvent, useState } from 'react';
+import React, { useEffect, ChangeEvent, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
@@ -6,8 +6,12 @@ import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../redux/store';
 import { connectWallet, changeNetwork } from '../walletconnect/connection';
-import { Swap, approval, ameBalanceget, contractData } from '../../utils/callHelpers'
+import { Swap, ameBalanceget, contractData, provider_main_export, currentBlock, timeToTheBlock } from '../../utils/callHelpers'
+import { calculateStartTime } from '../../utils/countdownTimer'
+import getTimePeriods from '../../utils/getTimePeriods'
 import * as types from '../../constants/actionConstants';
+import salescontractAbi from '../../config/abi/salesContract.json';
+import { ethers } from "ethers";
 
 const Main = styled.div`
     font-family: "Poppins", sans-serif;
@@ -247,6 +251,35 @@ const SwapButton = styled.button`
     font-weight: 500;
     border: solid 2px #000;
 `
+const SwapButtonDisabled = styled.button`
+    padding: 16px;
+    width: 100%;
+    font-weight: 500;
+    text-align: center;
+    border-radius: 20px;
+    outline: none;
+    border: 1px solid transparent;
+    color: white;
+    text-decoration: none;
+    display: grid;
+    -webkit-box-pack: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    -webkit-box-align: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    z-index: 1;
+    will-change: transform;
+    transition: transform 450ms ease 0s;
+    transform: perspective(1px) translateZ(0px);
+    background-color: #9681b1;
+    color: rgb(255 255 255);
+    font-size: 16px;
+    font-weight: 500;
+    border: solid 2px #000;
+    cursor: not-allowed;
+`
 
 const Gridsection = styled.div`
     display: grid;
@@ -304,11 +337,52 @@ const Input = styled.input`
 
 `;
 
+const CountDown = styled.div`
+    color: #fff;
+    display: flex;
+    font-size: 1em;
+    justify-content: center;
+
+`;
+
+const TimeCard = styled.div`
+    background: #333;
+    display: inline-block;
+    border-radius: 3px;
+    margin: 10px;
+    width: 54px;
+    padding: 5px 13px;
+`;
+
+const CountDownValue = styled.div`
+    color: #0fc;
+    font-size: 1rem;
+    
+`;
+
+const StartTag = styled.p`
+
+`;
+
+const CountDownUnit = styled.div`
+    text-transform: capitalize;
+`
+
 const Heading = styled.h1`
     color: #fff;
     justify-content: center;
     font-size: 5em;
 
+`;
+
+const SwapButtonSection = styled.div`
+    text-align: center;
+
+`;
+
+const EnsDiv = styled.div`
+ 
+text-align: center;
 `;
 
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
@@ -328,35 +402,84 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number })
 
 const SwapCard: React.FC = () => {
 
-    const [progress, setProgress] = React.useState(10);
+    const [datafromContract, setSaleData] = useState({
+        maxAllow: 0,
+        minAllow: 0,
+        startBlock: 0,
+        endBlock: 0,
+        raisingAmount: 0,
+        sold: 0
+    })
 
-    React.useEffect(() => {
+    const [timerCount, setTimer] = useState({
+        d: 0,
+        h: 0,
+        m: 0,
+        s: 0,
+    })
+    const [timerCountEnd, setTimerEnd] = useState({
+        d: 0,
+        h: 0,
+        m: 0,
+        s: 0,
+    })
+
+    const [secondsTime, setSecondsTime] = useState(59)
+    const [secondsTimeToGet, setSecondsTimeToGet] = useState(0)
+
+    const [progress, setProgress] = React.useState(0);
+    const [currentBlockNumber, setCurrentBlock] = useState(0);
+
+    useEffect(() => {
         const timer = setInterval(() => {
-            setProgress((prevProgress) => (prevProgress >= 100 ? 10 : prevProgress + 10));
+
+            const progressValue = (datafromContract.sold / datafromContract.raisingAmount) * 100;
+            if (progressValue >= 100) {
+                setProgress(100);
+            } else if (progressValue <= 0) {
+                setProgress(0);
+            } else {
+                setProgress(progressValue);
+            }
         }, 800);
         return () => {
             clearInterval(timer);
         };
-    }, []);
+    }, [datafromContract.sold, datafromContract.raisingAmount]);
 
     const dispatch = useDispatch();
+    const QTMSalesContract = "0xD19a95493e693CF75d2c8AF741F4874830DC667c";
 
-    async function getData() {
-        return (await contractData());
-    }
 
-    // const { max } = getData();
 
-    // console.log(max);
 
-    getData().then((data) => {
-        console.log(data[0]);
-    });
+    const fetchData = useCallback(async () => {
+        const contract = new ethers.Contract(QTMSalesContract, salescontractAbi, provider_main_export);
+
+        const data = (await contractData([
+            contract.MAX(),
+            contract.MIN(),
+            contract.startBlock(),
+            contract.endBlock(),
+            contract.raisingAmount(),
+            contract.sold()
+        ])) as [number, number, number, number, number, number, number]
+
+        const maxallow = ethers.utils.formatEther(data[0]);
+        const minallow = ethers.utils.formatEther(data[1]);
+        const raisingamount = ethers.utils.formatEther(data[4]);
+        const sold = ethers.utils.formatEther(data[5]);
+        setSaleData({ ...data, maxAllow: Number(maxallow), minAllow: Number(minallow), startBlock: Number(data[2]), endBlock: Number(data[3]), raisingAmount: Number(raisingamount), sold: Number(sold) })
+    }, [])
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData, datafromContract])
 
 
 
     const { address, web3, connected, networkID, ameBalance } = useSelector((state: AppState) => state.reducer);
-    const { isApproved, isApproving } = useSelector((state: AppState) => state.approvereducer);
+    const { isSwaping, isSwaped } = useSelector((state: AppState) => state.swapreducer);
 
 
     const connectToWallet = () => {
@@ -386,7 +509,9 @@ const SwapCard: React.FC = () => {
 
     const [AmeBalance, ameBalanceSet] = useState(0);
 
-    const [approvedBalance, setApprovedBalance] = useState(0);
+
+
+
 
     const [slider, setSlider] = useState(0);
 
@@ -416,50 +541,119 @@ const SwapCard: React.FC = () => {
                 }
             });
         }
-
-        //(approvedBalance);
-
         if (address) {
 
             setTimeout(() => {
                 fetchAME();
-                getData().then((data) => {
-                    console.log(data[0]);
-                });
 
             }, 10000);
         }
-    }, [approvedBalance, dispatch, address, ameBalance, web3, networkID]);
+    }, [dispatch, address, ameBalance, web3, networkID]);
+
+    async function fetchBlock() {
+        setCurrentBlock(Number(await currentBlock()));
+
+
+    }
+    setTimeout(() => {
+        fetchBlock()
+
+
+    }, 1000);
+
+
+
+
+    useEffect(() => {
+
+        const timeStart = calculateStartTime(currentBlockNumber, datafromContract.startBlock);
+        const timeEnd = calculateStartTime(currentBlockNumber, datafromContract.endBlock);
+
+        const countdownToUse = getTimePeriods(timeStart)
+        const countdownToUseEnd = getTimePeriods(timeEnd)
+
+
+        const days = Number(countdownToUse.days);
+        const hours = Number(countdownToUse.hours);
+        const minutes = Number(countdownToUse.minutes);
+        const seconds = Number(countdownToUse.seconds);
+
+        const daysE = Number(countdownToUseEnd.days);
+        const hoursE = Number(countdownToUseEnd.hours);
+        const minutesE = Number(countdownToUseEnd.minutes);
+        const secondsE = Number(countdownToUseEnd.seconds);
+
+
+
+        setTimer({ d: days, h: hours, m: minutes, s: seconds })
+        setTimerEnd({ d: daysE, h: hoursE, m: minutesE, s: secondsE })
+
+
+
+    }, [currentBlockNumber, datafromContract]);
+
+
+
 
     function walletconnectOnclick() {
         if (connected) {
-            if (isApproved) {
-                Swap(web3, amountsame);
-            } else {
-                //('approval');
-                if (isApproving) {
-                    return;
-                }
-                dispatch(approval(web3));
-            }
+
+            dispatch(Swap(web3, amountsame));
+
         } else {
             connectToWallet()
         }
     }
-    const isSwaping = false;
+
+
+
     function swapButtontext() {
         if (connected) {
-            if (isApproving) {
-                return 'Approving';
+            // if (isSwaping) {
+            //     return 'Entering Sale';
+            // }
+            if (currentBlockNumber > datafromContract.endBlock) {
+                return 'Sale ended'
             }
-            if (isSwaping) {
-                return 'Entering Sale';
+            if (progress >= 100) {
+                return 'Sale ended'
             }
+            if (amountsame <= 0) {
+                return 'Enter amount'
+            }
+
             return 'Enter Sale';
         } else {
             return 'Unlock Wallet';
         }
     }
+    function endIn() {
+        if (datafromContract.startBlock < currentBlockNumber) {
+            return (
+                <EnsDiv>
+                    <StartTag>Ends In</StartTag>
+                    <CountDown>
+                        <TimeCard>
+                            <CountDownValue>{timerCountEnd.d}d</CountDownValue>
+                            {/* <CountDownUnit>days</CountDownUnit> */}
+                        </TimeCard>
+                        <TimeCard>
+                            <CountDownValue>{timerCountEnd.h}h</CountDownValue>
+
+                            {/* <CountDownUnit>hours</CountDownUnit></TimeCard> */}
+                        </TimeCard>
+                        <TimeCard>
+                            <CountDownValue>{timerCountEnd.m}m</CountDownValue>
+                            {/* <CountDownUnit>minutes</CountDownUnit></TimeCard> */}
+                        </TimeCard>
+
+                    </CountDown>
+                </EnsDiv>
+
+            )
+        }
+    }
+
     function checkHpsBalabce() {
         if (ameBalance <= 10 && connected) {
             return <SwapButton disabled>Low AME Balance</SwapButton>;
@@ -468,8 +662,54 @@ const SwapCard: React.FC = () => {
                 return <SwapButton onClick={walletconnectOnclick} >{swapButtontext()}</SwapButton>
             } else {
 
-                if (isSwaping) {
-                    return <SwapButton>Entering Sale</SwapButton>
+                // if (isSwaping) {
+                //     return <SwapButtonDisabled>Entering Sale</SwapButtonDisabled>
+                // }
+                if (datafromContract.startBlock > currentBlockNumber) {
+                    if (timerCount.d === 0 && timerCount.h === 0 && timerCount.m === 0) {
+                        return (<>
+                            <StartTag>Starts In</StartTag>
+                            <CountDown>
+                                <TimeCard>
+                                    <CountDownValue>{timerCount.s}s</CountDownValue>
+                                    {/* <CountDownUnit>minutes</CountDownUnit></TimeCard> */}
+                                </TimeCard>
+
+                            </CountDown>
+                        </>)
+                    } else {
+                        return (
+                            <>
+                                <StartTag>Starts In</StartTag>
+                                <CountDown>
+                                    <TimeCard>
+                                        <CountDownValue>{timerCount.d}d</CountDownValue>
+                                        {/* <CountDownUnit>days</CountDownUnit> */}
+                                    </TimeCard>
+                                    <TimeCard>
+                                        <CountDownValue>{timerCount.h}h</CountDownValue>
+
+                                        {/* <CountDownUnit>hours</CountDownUnit></TimeCard> */}
+                                    </TimeCard>
+                                    <TimeCard>
+                                        <CountDownValue>{timerCount.m}m</CountDownValue>
+                                        {/* <CountDownUnit>minutes</CountDownUnit></TimeCard> */}
+                                    </TimeCard>
+
+                                </CountDown>
+                            </>
+
+                        )
+                    }
+                }
+                if (currentBlockNumber > datafromContract.endBlock) {
+                    return <SwapButtonDisabled disabled={true}>Sale ended</SwapButtonDisabled>
+                }
+                if (progress >= 100) {
+                    return <SwapButtonDisabled disabled={true}>Sale ended</SwapButtonDisabled>
+                }
+                if (amountsame <= 0) {
+                    return <SwapButtonDisabled disabled={true}>Enter amount</SwapButtonDisabled>
                 }
                 return <SwapButton onClick={walletconnectOnclick}>{swapButtontext()}</SwapButton>
 
@@ -485,8 +725,9 @@ const SwapCard: React.FC = () => {
                 <Box sx={{ width: '100%' }}>
                     <LinearProgressWithLabel value={progress} />
                 </Box>
-                <WholeThing>
+                <h2 style={{ color: 'white' }}>{datafromContract.sold}AME / {datafromContract.raisingAmount}AME</h2>
 
+                <WholeThing>
                     <Section>
                         <Gridsection>
                             <div>
@@ -514,36 +755,9 @@ const SwapCard: React.FC = () => {
                                         </CurrencyBalance>
                                     </CurrencyInputbalance>
                                 </Card>
-                                {/* <Arrow>
-                                    <img src={ArrowImg} width="50%" alt="" />
-                                </Arrow> */}
-                                {/* <Card>
-                                    <ValueSection>
-                                        <TokenButton>
-                                            <TokenButtonSpan>
-                                                <TokenButtonSpanDiv>
-                                                    <TokenImage src="https://tokens.1inch.io/0xeda21b525ac789eab1a08ef2404dd8505ffb973d.png" />
-                                                    <TokenNameSpan>
-                                                        AME
-                                                    </TokenNameSpan>
 
-                                                </TokenButtonSpanDiv>
-                                            </TokenButtonSpan>
-                                        </TokenButton>
-                                        <ValueInput type="number" readOnly value={amountsame} pattern="^[0-9]*[.,]?[0-9]*$" placeholder="0.0" />
-                                    </ValueSection>
-                                     <CurrencyInputbalance>
-                                        <CurrencyBalance>
-                                            <CurrencyBalanceview>
-                                                <Balance>You will get new AME</Balance>
-                                                <br />
-
-                                            </CurrencyBalanceview>
-                                        </CurrencyBalance>
-                                    </CurrencyInputbalance>
-                                </Card> */}
                             </div>
-                            {/* <Balance>AME V2 Balance: {HpsBalanceV2}</Balance> */}
+
                             <SliderInput>
                                 <Input
                                     type="range"
@@ -556,8 +770,10 @@ const SwapCard: React.FC = () => {
                                 <SliderValue>
                                     {slider}%
                                 </SliderValue>
+
                             </SliderInput>
-                            <div>
+                            {endIn()}
+                            <SwapButtonSection>
 
                                 {(networkID === Number(process.env.REACT_APP_NETWORK_ID) || networkID === 0) ? (
                                     <>
@@ -569,7 +785,7 @@ const SwapCard: React.FC = () => {
                                     </>
                                 )}
 
-                            </div>
+                            </SwapButtonSection>
                         </Gridsection>
                     </Section>
                 </WholeThing>
