@@ -372,6 +372,9 @@ const Heading = styled.h1`
     color: #fff;
     justify-content: center;
     font-size: 5em;
+    @media only screen and (max-width:700px){
+      font-size: 3em;
+    }
 
 `;
 
@@ -384,6 +387,13 @@ const EnsDiv = styled.div`
  
 text-align: center;
 `;
+
+const AmeAmounts = styled.h2`
+    @media only screen and (max-width:700px){
+      font-size: 1em;
+    }
+
+`
 
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
     return (
@@ -725,7 +735,7 @@ const SwapCard: React.FC = () => {
                 <Box sx={{ width: '100%' }}>
                     <LinearProgressWithLabel value={progress} />
                 </Box>
-                <h2 style={{ color: 'white' }}>{datafromContract.sold}AME / {datafromContract.raisingAmount}AME</h2>
+                <AmeAmounts style={{ color: 'white' }}>{datafromContract.sold}AME / {datafromContract.raisingAmount}AME</AmeAmounts>
 
                 <WholeThing>
                     <Section>
