@@ -395,6 +395,10 @@ const AmeAmounts = styled.h2`
 
 `
 
+const Buyamountp = styled.p`
+   font-weight: bold;
+`;
+
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
     return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
