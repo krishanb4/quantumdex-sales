@@ -32,7 +32,7 @@ export default function create() {
 }
 
 
-const contractAddress = "0x4Fd32530c0b627a42FCc4f1fA90ec3F270661BC9";
+const contractAddress = "0xd30752D994Caa637eB40E80fc03a0958ABbD3Fa2";
 const ameContract = "0xeDa21B525Ac789EaB1a08ef2404dd8505FfB973D";
 const ameV2Contract = "0xc9D53A339F3c22E016C6fA1E3Eb85AC32c75fED2";
 const provider_main = new ethers.providers.JsonRpcProvider(getNodeUrl());

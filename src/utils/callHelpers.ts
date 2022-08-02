@@ -40,10 +40,10 @@ export const provider_main_export = new ethers.providers.JsonRpcProvider(getNode
 
 
 
-const contractAddress = "0xD19a95493e693CF75d2c8AF741F4874830DC667c";
+const contractAddress = "0xd30752D994Caa637eB40E80fc03a0958ABbD3Fa2";
 const ameContract = "0xeDa21B525Ac789EaB1a08ef2404dd8505FfB973D"; 
 
-const QTMSalesContract = "0xD19a95493e693CF75d2c8AF741F4874830DC667c";
+const QTMSalesContract = "0xd30752D994Caa637eB40E80fc03a0958ABbD3Fa2";
 const provider_main = new ethers.providers.JsonRpcProvider(getNodeUrl());
 
 export const mint = async (web3:any) => {

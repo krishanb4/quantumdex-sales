@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../redux/store';
 import { connectWallet, changeNetwork } from '../walletconnect/connection';
-import { Swap, ameBalanceget, contractData, provider_main_export, currentBlock, timeToTheBlock } from '../../utils/callHelpers'
+import { Swap, ameBalanceget, contractData, provider_main_export, currentBlock } from '../../utils/callHelpers'
 import { calculateStartTime } from '../../utils/countdownTimer'
 import getTimePeriods from '../../utils/getTimePeriods'
 import * as types from '../../constants/actionConstants';
@@ -45,6 +45,29 @@ const Section = styled.div`
         max-width: 368px;
     }
 `
+
+const BuySection = styled.div`
+    background: white;
+    width: 100%;
+    border: solid 2px #000;
+    background: linear-gradient(
+        to right bottom,
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.3)
+    );
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    border-radius: 2rem;
+    z-index: 2;
+    backdrop-filter: blur(2rem);
+    padding: 8px;
+    @media only screen and (max-width:700px){
+        max-width: 368px;
+    }
+`;
+
+
 
 const Card = styled.div`
     display: flex;
@@ -395,6 +418,10 @@ const AmeAmounts = styled.h2`
 
 `
 
+const Buyamountp = styled.p`
+   font-weight: bold;
+`;
+
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
     return (
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -418,7 +445,8 @@ const SwapCard: React.FC = () => {
         startBlock: 0,
         endBlock: 0,
         raisingAmount: 0,
-        sold: 0
+        sold: 0,
+        whitelistedCheck: false,
     })
 
     const [timerCount, setTimer] = useState({
@@ -458,9 +486,10 @@ const SwapCard: React.FC = () => {
     }, [datafromContract.sold, datafromContract.raisingAmount]);
 
     const dispatch = useDispatch();
-    const QTMSalesContract = "0xD19a95493e693CF75d2c8AF741F4874830DC667c";
+    const QTMSalesContract = "0xd30752D994Caa637eB40E80fc03a0958ABbD3Fa2";
 
-
+    const { address, web3, connected, networkID, ameBalance } = useSelector((state: AppState) => state.reducer);
+    const { isSwaping, isSwaped } = useSelector((state: AppState) => state.swapreducer);
 
 
     const fetchData = useCallback(async () => {
@@ -472,26 +501,21 @@ const SwapCard: React.FC = () => {
             contract.startBlock(),
             contract.endBlock(),
             contract.raisingAmount(),
-            contract.sold()
-        ])) as [number, number, number, number, number, number, number]
+            contract.sold(),
+            contract.whitelisted(address)
+        ])) as [number, number, number, number, number, number, boolean]
 
         const maxallow = ethers.utils.formatEther(data[0]);
         const minallow = ethers.utils.formatEther(data[1]);
         const raisingamount = ethers.utils.formatEther(data[4]);
         const sold = ethers.utils.formatEther(data[5]);
-        setSaleData({ ...data, maxAllow: Number(maxallow), minAllow: Number(minallow), startBlock: Number(data[2]), endBlock: Number(data[3]), raisingAmount: Number(raisingamount), sold: Number(sold) })
-    }, [])
+        const whitelistedData = data[6];
+        setSaleData({ ...data, maxAllow: Number(maxallow), minAllow: Number(minallow), startBlock: Number(data[2]), endBlock: Number(data[3]), raisingAmount: Number(raisingamount), sold: Number(sold), whitelistedCheck: whitelistedData })
+    }, [address])
 
     useEffect(() => {
         fetchData();
     }, [fetchData, datafromContract])
-
-
-
-    const { address, web3, connected, networkID, ameBalance } = useSelector((state: AppState) => state.reducer);
-    const { isSwaping, isSwaped } = useSelector((state: AppState) => state.swapreducer);
-
-
     const connectToWallet = () => {
         dispatch(connectWallet());
     };
@@ -672,9 +696,10 @@ const SwapCard: React.FC = () => {
                 return <SwapButton onClick={walletconnectOnclick} >{swapButtontext()}</SwapButton>
             } else {
 
-                // if (isSwaping) {
-                //     return <SwapButtonDisabled>Entering Sale</SwapButtonDisabled>
-                // }
+                if (!datafromContract.whitelistedCheck) {
+                    return <SwapButtonDisabled disabled={true}>You are not whitelisted</SwapButtonDisabled>
+                }
+
                 if (datafromContract.startBlock > currentBlockNumber) {
                     if (timerCount.d === 0 && timerCount.h === 0 && timerCount.m === 0) {
                         return (<>
@@ -731,13 +756,17 @@ const SwapCard: React.FC = () => {
     return (
         <>
             <Main>
-                <Heading>Public Sale</Heading>
+                <Heading>Private Sale</Heading>
                 <Box sx={{ width: '100%' }}>
                     <LinearProgressWithLabel value={progress} />
                 </Box>
-                <AmeAmounts style={{ color: 'white' }}>{datafromContract.sold}AME / {datafromContract.raisingAmount}AME</AmeAmounts>
+                <AmeAmounts style={{ color: 'white' }}>{datafromContract.sold} AME / {datafromContract.raisingAmount} AME</AmeAmounts>
 
                 <WholeThing>
+                    <BuySection>
+                        <Buyamountp>Minimum Buy : {datafromContract.minAllow} AME</Buyamountp>
+                        <Buyamountp>Maximum Buy : {datafromContract.maxAllow} AME</Buyamountp>
+                    </BuySection>
                     <Section>
                         <Gridsection>
                             <div>
