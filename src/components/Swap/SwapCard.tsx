@@ -738,6 +738,10 @@ const SwapCard: React.FC = () => {
                 <AmeAmounts style={{ color: 'white' }}>{datafromContract.sold}AME / {datafromContract.raisingAmount}AME</AmeAmounts>
 
                 <WholeThing>
+                    <BuySection>
+                        <Buyamountp>Minimum Buy : {datafromContract.minAllow} AME</Buyamountp>
+                        <Buyamountp>Maximum Buy : {datafromContract.maxAllow} AME</Buyamountp>
+                    </BuySection>
                     <Section>
                         <Gridsection>
                             <div>
