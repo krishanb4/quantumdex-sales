@@ -46,6 +46,27 @@ const Section = styled.div`
     }
 `
 
+const BuySection = styled.div`
+    background: white;
+    width: 100%;
+    border: solid 2px #000;
+    background: linear-gradient(
+        to right bottom,
+        rgba(255, 255, 255, 0.7),
+        rgba(255, 255, 255, 0.3)
+    );
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    border-radius: 2rem;
+    z-index: 2;
+    backdrop-filter: blur(2rem);
+    padding: 8px;
+    @media only screen and (max-width:700px){
+        max-width: 368px;
+    }
+`;
+
 const Card = styled.div`
     display: flex;
     background: linear-gradient(
